@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aztlán Car Rental — Renta de autos de lujo en Jalisco">
+  <meta name="theme-color" content="#000000">
+  <title>Aztlán Car Rental</title>
+
+  <!-- ═══════════════════════════════════════════════════════
+       🔖  FAVICON
+       Coloca tu archivo de ícono en la misma carpeta que este
+       index.html y ajusta el nombre/extensión si es necesario.
+
+       Ejemplos:
+         .ico → <link rel="icon" href="favicon.ico" type="image/x-icon">
+         .png → <link rel="icon" href="favicon.png" type="image/png">
+         .svg → <link rel="icon" href="favicon.svg" type="image/svg+xml">
+       ═══════════════════════════════════════════════════════ -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Google Fonts: Cinzel (títulos elegantes) + Raleway (cuerpo) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Raleway:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+  <!-- GSAP 3 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+          crossorigin="anonymous"></script>
+
+  <style>
+    /* ══════════════════════════════════════════════════════
+       VARIABLES
+       ══════════════════════════════════════════════════════ */
+    :root {
+      --gold:        #D4AF37;
+      --gold-light:  #F5D97F;
+      --gold-dark:   #A38728;
+      --black:       #000000;
+      --text:        #EDE0C4;
+      --text-muted:  rgba(237, 224, 196, 0.45);
+      --surface:     rgba(255, 255, 255, 0.03);
+      --border:      rgba(212, 175, 55, 0.2);
+
+      /* Colores de marca por red social */
+      --c-wa:   #25D366;   /* WhatsApp  */
+      --c-tt:   #69C9D0;   /* TikTok    */
+      --c-ig:   #E1306C;   /* Instagram */
+      --c-fb:   #1877F2;   /* Facebook  */
+      --c-gm:   #EA4335;   /* Maps      */
+      --c-web:  #D4AF37;   /* Web       */
+    }
+
+    /* ══════════════════════════════════════════════════════
+       RESET
+       ══════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      min-height: 100vh;
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       FONDO: Patrón de cuadrícula dorada sutil (tipo greca)
+       ══════════════════════════════════════════════════════ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      /* Cuadrícula de líneas doradas muy tenues */
+      background-image:
+        repeating-linear-gradient(0deg,
+          transparent, transparent 49px,
+          rgba(212,175,55,.05) 49px, rgba(212,175,55,.05) 50px),
+        repeating-linear-gradient(90deg,
+          transparent, transparent 49px,
+          rgba(212,175,55,.05) 49px, rgba(212,175,55,.05) 50px);
+    }
+
+    /* Rombos diagonales aztecas (segunda capa) */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 4 L76 40 L40 76 L4 40 Z' fill='none' stroke='%23D4AF37' stroke-width='0.6' opacity='0.06'/%3E%3Cpath d='M40 18 L62 40 L40 62 L18 40 Z' fill='none' stroke='%23D4AF37' stroke-width='0.6' opacity='0.06'/%3E%3C/svg%3E");
+    }
+
+    /* ══════════════════════════════════════════════════════
+       INTRO / PANTALLA DE ANIMACIÓN
+       ══════════════════════════════════════════════════════ */
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      /* Sin fondo propio — las cortinas cubren todo */
+    }
+
+    /* Cortina superior (mitad de arriba) */
+    .curtain-top {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 50%;
+      background: var(--black);
+      z-index: 10;
+      transform-origin: top center;
+    }
+
+    /* Línea dorada entre cortinas */
+    .curtain-seam {
+      position: absolute;
+      top: 50%; left: 0;
+      width: 100%; height: 1px;
+      transform: translateY(-50%);
+      background: linear-gradient(to right,
+        transparent 0%, var(--gold) 25%,
+        var(--gold) 75%, transparent 100%);
+      z-index: 12;
+    }
+
+    /* Cortina inferior (mitad de abajo) */
+    .curtain-bot {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 50%;
+      background: var(--black);
+      z-index: 10;
+      transform-origin: bottom center;
+    }
+
+    /* Logo en la intro — animado como "auto que frena" */
+    #logo-intro {
+      position: absolute;
+      z-index: 20;
+      /* GSAP posicionará left/top/transform vía JS */
+      width: 72%;
+      max-width: 260px;
+    }
+    #logo-intro svg,
+    #logo-intro img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 0 22px rgba(212,175,55,.45));
+    }
+
+    /* ══════════════════════════════════════════════════════
+       CONTENIDO PRINCIPAL
+       ══════════════════════════════════════════════════════ */
+    #content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1.25rem 3.5rem;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      text-align: center;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* Espacio del logo en el header — más grande, sin títulos de texto */
+    .logo-header {
+      display: block;
+      margin: 0 auto;
+      width: 85%;
+      max-width: 320px;
+    }
+    .logo-header svg,
+    .logo-header img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 0 18px rgba(212,175,55,.32));
+    }
+
+    /* ── DIVISOR DORADO CON ÍCONO ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      width: 100%;
+      max-width: 400px;
+      margin: 1.3rem auto;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dark), transparent);
+    }
+    .divider-icon {
+      font-size: .65rem;
+      color: var(--gold);
+      opacity: .65;
+    }
+
+    /* ── MARCO AZTECA (esquinas decorativas) ── */
+    .aztec-frame {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      padding: 6px 2px;
+    }
+    .frame-corner {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      opacity: .5;
+    }
+    .frame-corner.tl { top: -2px;    left: -2px; }
+    .frame-corner.tr { top: -2px;    right: -2px;  transform: scaleX(-1); }
+    .frame-corner.bl { bottom: -2px; left: -2px;   transform: scaleY(-1); }
+    .frame-corner.br { bottom: -2px; right: -2px;  transform: scale(-1); }
+
+    /* ── LISTA DE BOTONES ── */
+    .links-nav {
+      display: flex;
+      flex-direction: column;
+      gap: .85rem;
+      width: 100%;
+    }
+
+    .link-btn {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .88rem 1.1rem;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+      transition: transform .25s ease,
+                  border-color .25s ease,
+                  box-shadow .25s ease,
+                  background .25s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Efecto shimmer (brillo al hover) */
+    .link-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(212,175,55,.07) 50%,
+        transparent 100%);
+      transform: translateX(-100%);
+      transition: transform .55s ease;
+      pointer-events: none;
+    }
+    .link-btn:hover::before { transform: translateX(100%); }
+
+    .link-btn:hover,
+    .link-btn:focus-visible {
+      border-color: rgba(212,175,55,.55);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.55),
+                  0 2px 8px rgba(212,175,55,.1);
+      background: rgba(255,255,255,.05);
+      outline: none;
+    }
+    .link-btn:active {
+      transform: translateY(0) scale(.98);
+    }
+
+    /* ── ÍCONO CON PULSO ── */
+    .icon-wrap {
+      position: relative;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+      background: rgba(255,255,255,.05);
+      /* color viene de inline style: --ic */
+      color: var(--ic, var(--gold));
+    }
+
+    /* Anillo pulsante */
+    .icon-wrap::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1.5px solid var(--ic, var(--gold));
+      animation: ring-pulse 2.8s ease-in-out infinite;
+      animation-delay: var(--pd, 0s);
+    }
+
+    /* Respiración suave del ícono */
+    .icon-wrap i {
+      animation: icon-breathe 2.8s ease-in-out infinite;
+      animation-delay: var(--pd, 0s);
+    }
+
+    @keyframes ring-pulse {
+      0%, 100% { transform: scale(1);    opacity: .55; }
+      60%       { transform: scale(1.38); opacity: 0;   }
+    }
+    @keyframes icon-breathe {
+      0%, 100% { transform: scale(1);    }
+      50%       { transform: scale(1.13); }
+    }
+
+    /* Instagram — gradiente en el ícono */
+    .insta-grad {
+      background: linear-gradient(45deg,
+        #f09433 0%, #e6683c 25%,
+        #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── TEXTO DEL BOTÓN ── */
+    .btn-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: .08rem;
+      min-width: 0;
+    }
+    .btn-label {
+      font-family: 'Cinzel', serif;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .06em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn-sub {
+      font-size: .67rem;
+      color: var(--text-muted);
+      letter-spacing: .02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Flecha derecha */
+    .btn-chevron {
+      color: var(--gold-dark);
+      font-size: .72rem;
+      flex-shrink: 0;
+      opacity: .45;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    .link-btn:hover .btn-chevron {
+      transform: translateX(4px);
+      opacity: .9;
+    }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      margin-top: 2.5rem;
+      text-align: center;
+    }
+    .site-footer p {
+      font-size: .58rem;
+      color: rgba(212,175,55,.3);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       RESPONSIVE (Mobile First — base ~360px)
+       ══════════════════════════════════════════════════════ */
+    @media (min-width: 480px) {
+      .logo-header   { max-width: 360px; }
+      .link-btn      { padding: 1rem 1.3rem; gap: 1.1rem; }
+      .icon-wrap     { width: 48px; height: 48px; font-size: 1.3rem; }
+      .btn-label     { font-size: .87rem; }
+      .btn-sub       { font-size: .71rem; }
+      #logo-intro    { max-width: 300px; }
+    }
+    @media (min-width: 640px) {
+      #content       { padding: 3rem 2rem 4rem; }
+    }
+
+    /* Respeta la preferencia de movimiento reducido */
+    @media (prefers-reduced-motion: reduce) {
+      .icon-wrap::after,
+      .icon-wrap i        { animation: none; }
+      .link-btn           { transition: none; }
+      .link-btn::before   { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     INTRO — Pantalla de animación (GSAP la controla)
+     ═══════════════════════════════════════════════════════ -->
+<div id="intro" aria-hidden="true">
+  <div class="curtain-top"></div>
+  <div class="curtain-seam"></div>
+  <div class="curtain-bot"></div>
+
+  <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║  🚗  LOGO SVG — INTRO (Animación de entrada)        ║
+    ║                                                      ║
+    ║  INSTRUCCIONES:                                      ║
+    ║  Reemplaza TODO el contenido dentro de este <svg>   ║
+    ║  con el código SVG de tu logo.                      ║
+    ║                                                      ║
+    ║  Recomendaciones:                                    ║
+    ║  • Incluye un atributo viewBox correcto.            ║
+    ║  • Usa colores dorados (#D4AF37) o blancos para     ║
+    ║    buen contraste sobre fondo negro.                ║
+    ║                                                      ║
+    ║  Ejemplo mínimo:                                     ║
+    ║  <svg viewBox="0 0 400 160"                         ║
+    ║       xmlns="http://www.w3.org/2000/svg">           ║
+    ║    <!-- tu logo aquí →                              ║
+    ║  </svg>                                              ║
+    ╚══════════════════════════════════════════════════════╝
+  -->
+  <div id="logo-intro">
+    <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg"
+         role="img" aria-label="Aztlán Car Rental">
+      <!-- ▼▼▼  PLACEHOLDER — reemplaza todo lo de abajo con tu logo  ▼▼▼ -->
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#A38728"/>
+          <stop offset="50%"  stop-color="#F5D97F"/>
+          <stop offset="100%" stop-color="#A38728"/>
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="316" height="126" rx="5"
+            fill="none" stroke="url(#g1)" stroke-width="1.5" opacity=".65"/>
+      <line x1="22" y1="20" x2="298" y2="20" stroke="#D4AF37" stroke-width=".7" opacity=".35"/>
+      <line x1="22" y1="110" x2="298" y2="110" stroke="#D4AF37" stroke-width=".7" opacity=".35"/>
+      <!-- Esquinas decorativas -->
+      <path d="M8 8 h12 v12" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity=".5"/>
+      <path d="M312 8 h-12 v12" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity=".5"/>
+      <path d="M8 122 h12 v-12" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity=".5"/>
+      <path d="M312 122 h-12 v-12" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity=".5"/>
+      <!-- Texto -->
+      <text x="160" y="63"
+            text-anchor="middle"
+            font-family="Georgia, 'Times New Roman', serif"
+            font-size="32" font-weight="bold"
+            fill="url(#g1)" letter-spacing="7">AZTLÁN</text>
+      <text x="160" y="89"
+            text-anchor="middle"
+            font-family="Georgia, 'Times New Roman', serif"
+            font-size="11" fill="#D4AF37" opacity=".72" letter-spacing="9">CAR  RENTAL</text>
+      <!-- ▲▲▲  Fin del placeholder  ▲▲▲ -->
+    </svg>
+  </div>
+</div><!-- /#intro -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     CONTENIDO PRINCIPAL
+     ═══════════════════════════════════════════════════════ -->
+<main id="content" role="main">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <!--
+      ╔═══════════════════════════════════════════════════╗
+      ║  🏷️  LOGO EN HEADER                              ║
+      ║  Reemplaza el <svg> de abajo con el mismo logo   ║
+      ║  (o una versión simplificada para tamaño chico). ║
+      ╚═══════════════════════════════════════════════════╝
+    -->
+    <div class="logo-header">
+      <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Aztlán Car Rental">
+        <!-- ▼ PLACEHOLDER — reemplaza con tu logo ▼ -->
+        <defs>
+          <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#A38728"/>
+            <stop offset="50%"  stop-color="#F5D97F"/>
+            <stop offset="100%" stop-color="#A38728"/>
+          </linearGradient>
+        </defs>
+        <text x="160" y="63"
+              text-anchor="middle"
+              font-family="Georgia, 'Times New Roman', serif"
+              font-size="32" font-weight="bold"
+              fill="url(#g2)" letter-spacing="7">AZTLÁN</text>
+        <text x="160" y="89"
+              text-anchor="middle"
+              font-family="Georgia, 'Times New Roman', serif"
+              font-size="11" fill="#D4AF37" opacity=".72" letter-spacing="9">CAR  RENTAL</text>
+        <!-- ▲ Fin del placeholder ▲ -->
+      </svg>
+    </div>
+  </header>
+
+  <!-- DIVISOR -->
+  <div class="divider" role="presentation" aria-hidden="true">
+    <div class="divider-line"></div>
+    <i class="fas fa-car divider-icon"></i>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- MARCO AZTECA + BOTONES -->
+  <div class="aztec-frame">
+
+    <!-- Esquinas SVG -->
+    <svg class="frame-corner tl" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <path d="M26 2H2V26" stroke="#D4AF37" stroke-width="2" stroke-linecap="square"/>
+      <rect x="5" y="5" width="4" height="4" fill="#D4AF37" opacity=".45"/>
+    </svg>
+    <svg class="frame-corner tr" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <path d="M26 2H2V26" stroke="#D4AF37" stroke-width="2" stroke-linecap="square"/>
+      <rect x="5" y="5" width="4" height="4" fill="#D4AF37" opacity=".45"/>
+    </svg>
+    <svg class="frame-corner bl" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <path d="M26 2H2V26" stroke="#D4AF37" stroke-width="2" stroke-linecap="square"/>
+      <rect x="5" y="5" width="4" height="4" fill="#D4AF37" opacity=".45"/>
+    </svg>
+    <svg class="frame-corner br" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <path d="M26 2H2V26" stroke="#D4AF37" stroke-width="2" stroke-linecap="square"/>
+      <rect x="5" y="5" width="4" height="4" fill="#D4AF37" opacity=".45"/>
+    </svg>
+
+    <!-- ══════════════════════════════════════════════
+         BOTONES DE ENLACE
+         ══════════════════════════════════════════════ -->
+    <nav class="links-nav" aria-label="Redes sociales y contacto">
+
+      <!-- 1 · WhatsApp ─────────────────────────────
+           Mensaje pre-llenado: personalizable abajo.
+           Para cambiar el texto edita el parámetro
+           "text=" dentro del href (URL-encoded).
+           ──────────────────────────────────────── -->
+      <a class="link-btn"
+         href="https://wa.me/5213314511466?text=Hola%20Aztl%C3%A1n%20Car%20Rental%20%F0%9F%91%8B%2C%20me%20interesa%20rentar%20un%20auto.%20%C2%BFPodr%C3%ADan%20informarme%20sobre%20disponibilidad%20y%20tarifas%3F"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Enviar mensaje por WhatsApp al +52 1 33 1451 1466"
+         style="--ic: var(--c-wa); --pd: 0s;">
+        <div class="icon-wrap" aria-hidden="true">
+          <i class="fab fa-whatsapp"></i>
+        </div>
+        <div class="btn-info">
+          <span class="btn-label">WhatsApp</span>
+          <span class="btn-sub">+52 1 33 1451 1466</span>
+        </div>
+        <i class="fas fa-chevron-right btn-chevron" aria-hidden="true"></i>
+      </a>
+
+      <!-- 2 · TikTok -->
+      <a class="link-btn"
+         href="https://www.tiktok.com/@aztlancarrental"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Visitar TikTok de Aztlán Car Rental"
+         style="--ic: var(--c-tt); --pd: .45s;">
+        <div class="icon-wrap" aria-hidden="true">
+          <i class="fab fa-tiktok"></i>
+        </div>
+        <div class="btn-info">
+          <span class="btn-label">TikTok</span>
+          <span class="btn-sub">@aztlancarrental</span>
+        </div>
+        <i class="fas fa-chevron-right btn-chevron" aria-hidden="true"></i>
+      </a>
+
+      <!-- 3 · Instagram -->
+      <a class="link-btn"
+         href="https://www.instagram.com/aztlancarrental"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Visitar Instagram de Aztlán Car Rental"
+         style="--ic: var(--c-ig); --pd: .9s;">
+        <div class="icon-wrap" aria-hidden="true">
+          <i class="fab fa-instagram insta-grad"></i>
+        </div>
+        <div class="btn-info">
+          <span class="btn-label">Instagram</span>
+          <span class="btn-sub">@aztlancarrental</span>
+        </div>
+        <i class="fas fa-chevron-right btn-chevron" aria-hidden="true"></i>
+      </a>
+
+      <!-- 4 · Facebook -->
+      <a class="link-btn"
+         href="https://www.facebook.com/share/17WCGNJYhZ/?mibextid=wwXIfr"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Visitar Facebook de Aztlán Car Rental"
+         style="--ic: var(--c-fb); --pd: 1.35s;">
+        <div class="icon-wrap" aria-hidden="true">
+          <i class="fab fa-facebook-f"></i>
+        </div>
+        <div class="btn-info">
+          <span class="btn-label">Facebook</span>
+          <span class="btn-sub">Aztlán Car Rental</span>
+        </div>
+        <i class="fas fa-chevron-right btn-chevron" aria-hidden="true"></i>
+      </a>
+
+      <!-- 5 · Ubicación -->
+      <a class="link-btn"
+         href="https://maps.app.goo.gl/PAhRxSfmFPf1bCNs7"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Ver nuestra ubicación en Google Maps"
+         style="--ic: var(--c-gm); --pd: 1.8s;">
+        <div class="icon-wrap" aria-hidden="true">
+          <i class="fas fa-location-dot"></i>
+        </div>
+        <div class="btn-info">
+          <span class="btn-label">Nuestra Ubicación</span>
+          <span class="btn-sub">Ver en Google Maps</span>
+        </div>
+        <i class="fas fa-chevron-right btn-chevron" aria-hidden="true"></i>
+      </a>
+
+      <!-- 6 · Sitio Web -->
+      <a class="link-btn"
+         href="https://aztlancarrental.com/"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Visitar el sitio web oficial de Aztlán Car Rental"
+         style="--ic: var(--c-web); --pd: 2.25s;">
+        <div class="icon-wrap" aria-hidden="true">
+          <i class="fas fa-globe"></i>
+        </div>
+        <div class="btn-info">
+          <span class="btn-label">Sitio Web Oficial</span>
+          <span class="btn-sub">aztlancarrental.com</span>
+        </div>
+        <i class="fas fa-chevron-right btn-chevron" aria-hidden="true"></i>
+      </a>
+
+    </nav><!-- /.links-nav -->
+  </div><!-- /.aztec-frame -->
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>© 2025 Aztlán Car Rental · Todos los derechos reservados</p>
+  </footer>
+
+</main><!-- /#content -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     GSAP — ANIMACIONES
+     ═══════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  /* Si el usuario prefiere reducir movimiento, saltamos todo */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.getElementById('intro').remove();
+    gsap.set('#content', { autoAlpha: 1 });
+    return;
+  }
+
+  /* ── Elementos ── */
+  const intro      = document.getElementById('intro');
+  const logoIntro  = document.getElementById('logo-intro');
+  const curtTop    = document.querySelector('.curtain-top');
+  const curtBot    = document.querySelector('.curtain-bot');
+  const seam       = document.querySelector('.curtain-seam');
+  const content    = document.getElementById('content');
+
+  /* ── Estado inicial ── */
+  gsap.set(content, { autoAlpha: 0, y: 28 });
+
+  /* Logo posicionado en el centro pero off-screen a la izquierda */
+  gsap.set(logoIntro, {
+    left: '50%',
+    top:  '50%',
+    xPercent: -50,
+    yPercent: -50,
+    x: '-165vw'   /* Empieza completamente fuera de pantalla */
+  });
+
+  /* ── Timeline principal ── */
+  const tl = gsap.timeline();
+
+  /* ─────────────────────────────────────────────────────
+     FASE 1: Efecto Carro
+     El logo entra a toda velocidad desde la izquierda
+     y frena bruscamente en el centro.
+     ───────────────────────────────────────────────────── */
+  tl
+    /* Entrada rápida — power4 = desaceleración exponencial */
+    .to(logoIntro, {
+      x: '12px',
+      duration: 1.05,
+      ease: 'power4.out'
+    })
+
+    /* Frenón: rebote de inercia (3 micro-movimientos) */
+    .to(logoIntro, { x: '-11px', duration: .10, ease: 'power2.in' })
+    .to(logoIntro, { x: '6px',  duration: .08, ease: 'power2.out' })
+    .to(logoIntro, { x: '0px',  duration: .06, ease: 'none' })
+
+    /* Pausa: el "auto" está estacionado */
+    .to({}, { duration: .55 })
+
+  /* ─────────────────────────────────────────────────────
+     FASE 2: Efecto Párpado
+     Las dos cortinas negras se abren como un ojo
+     revelando el contenido principal.
+     ───────────────────────────────────────────────────── */
+    .to(curtTop, {
+      y: '-100%',
+      duration: .8,
+      ease: 'power3.inOut'
+    })
+    .to(curtBot, {
+      y: '100%',
+      duration: .8,
+      ease: 'power3.inOut'
+    }, '<')                  /* '<' = simultáneo con el anterior */
+
+    /* La línea dorada se desvanece */
+    .to(seam, { autoAlpha: 0, duration: .3 }, '<')
+
+    /* El logo intro se desvanece */
+    .to(logoIntro, { autoAlpha: 0, duration: .3, ease: 'power2.in' }, '<+=.05')
+
+    /* Limpiamos el overlay del DOM */
+    .to(intro, {
+      autoAlpha: 0,
+      duration: .25,
+      onComplete: () => { if (intro.parentNode) intro.remove(); }
+    }, '-=.05')
+
+  /* ─────────────────────────────────────────────────────
+     FASE 3: Contenido principal aparece
+     ───────────────────────────────────────────────────── */
+    .to(content, {
+      autoAlpha: 1,
+      y: 0,
+      duration: .6,
+      ease: 'power2.out'
+    }, '-=.18')
+
+    /* Los botones entran en cascada (stagger) */
+    .from('.link-btn', {
+      autoAlpha: 0,
+      y: 22,
+      duration: .42,
+      stagger: .09,
+      ease: 'power2.out'
+    }, '-=.38');
+
+}());
+</script>
+
+</body>
+</html>
